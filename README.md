@@ -1,6 +1,6 @@
 # Astro + Decap CMS + Cloudflare Template
 
-A starter template for building a static site with [Astro](https://astro.build) and managing its content with [Decap CMS](https://decapcms.org/), all deployed on [Cloudflare Pages](https://pages.cloudflare.com/). This setup includes a Cloudflare Worker acting as a custom GitHub OAuth proxy, allowing you to authenticate via GitHub without relying on Netlify Identity or Git Gateway. Additionally, you can optionally use [Cloudflare Zero Trust (Access)](https://www.cloudflare.com/products/zero-trust/access/) to add an extra layer of security to your `/admin` page.
+A starter template for building a static site with [Astro](https://astro.build) and managing its content with [Decap CMS](https://decapcms.org/), all deployed on [Cloudflare Pages](https://pages.cloudflare.com/). This setup includes a Cloudflare Worker acting as a custom GitHub OAuth proxy, allowing you to authenticate via GitHub without relying on Netlify Identity or Git Gateway. Additionally, you can use [Cloudflare Zero Trust (Access)](https://www.cloudflare.com/products/zero-trust/access/) to add an extra layer of security to your `/admin` page.
 
 ## Features
 
