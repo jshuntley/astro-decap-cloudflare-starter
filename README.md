@@ -20,7 +20,7 @@ A starter template for building a static site with [Astro](https://astro.build) 
 
 ## Getting Started
 
-You can either use this repository as a boilerplate to get started quickly or follow the manual setup instructions to configure each component individually.
+You can either use this repository as a boilerplate to get started quickly or follow the [manual setup](#manual-setup) instructions to configure each component individually.
 
 ### Quick Start with Boilerplate
 
@@ -82,6 +82,7 @@ Follow these steps to manually set up each component of the stack.
    ```
 
 3. **Build the Project as Desired**
+
    Customize your Astro project by adding pages, components, styles, and other assets.
 
    - **Example:** Create a simple homepage by editing `src/pages/index.astro`:
@@ -125,7 +126,7 @@ Follow these steps to manually set up each component of the stack.
        name: github
        repo: "your-username/your-repo" # Replace with your GitHub username/repo
        branch: main
-       base_url: "https://decap.your-domain.com" # To be set after configuring OAuth proxy
+       base_url: "https://decap.your-domain.com" # This subdomainis for the OAuth proxy
        auth_endpoint: "auth" # Default path for authentication
 
      site_url: "https://your-domain.com"
@@ -147,7 +148,9 @@ Follow these steps to manually set up each component of the stack.
 2. **Add Decap CMS Interface**
 
    - **Create `index.html`:**
+
      In `public/admin/`, create an `index.html` file with the following content:
+
      ```html
      <!DOCTYPE html>
      <html>
@@ -190,20 +193,13 @@ Follow these steps to manually set up each component of the stack.
    - **Fill in the Application Details:**
      - **Application name:** `Decap CMS OAuth Proxy` (or any name you prefer).
      - **Homepage URL:** `https://your-domain.com` (your main site).
-     - **Authorization callback URL:** `https://decap.your-domain.com/callback` (to be set up after deploying the OAuth proxy).
+     - **Authorization callback URL:** `https://decap.your-domain.com/callback` (the subdomain specifically for the OAuth proxy).
 
 3. **Save the OAuth App**
    - Click **"Register application"**.
-   - **Note the Client ID and Client Secret:**  
+   - **Note the Client ID and Client Secret:**
+     You can save these to `decap-proxy/.env` file for local development.
      You'll need these credentials later when configuring the Cloudflare Worker.
-
-##### b. Configure OAuth Scopes
-
-- **Ensure the OAuth App Requests the Correct Scopes:**  
-  Since your repository is private, you need to request the `repo` scope. This allows Decap CMS to access and modify private repositories.
-
-  - **In the OAuth Authorization URL:**  
-    Ensure the `scope` parameter includes `repo`. This will be handled in the OAuth proxy configuration.
 
 #### 4. Configure the decap-proxy worker
 
@@ -240,7 +236,22 @@ Follow these steps to manually set up each component of the stack.
          - `pattern`: The subdomain where the OAuth proxy will be accessible (e.g., `decap.your-domain.com`).
          - `zone_name`: Your main domain managed in Cloudflare (e.g., `your-domain.com`).
 
+   - **Ensure the Worker Requests the Correct Scopes:**  
+     If your repository is private, you need to request the `repo` scope. This allows Decap CMS to access and modify private repositories.
+
+     In your `decap-proxy/src/index.ts` file, line 30,you can see the `scope` parameter is set to `'public_repo,user'`. This is the default scope for public repositories.
+
+     ```typescript
+     const authorizationUri = oauth2.authorizeURL({
+       redirect_uri: `https://${url.hostname}/callback?provider=github`,
+       scope: "public_repo,user", // change this to 'repo' if your repository is private
+       state: randomBytes(4).toString("hex"),
+     });
+     ```
+
 ##### b. Deploy the Worker
+
+While still in the `decap-proxy` directory, deploy the worker to Cloudflare.
 
 1. **Login to Cloudflare via Wrangler**
 
@@ -254,8 +265,6 @@ Follow these steps to manually set up each component of the stack.
    ```bash
    npm run deploy
    ```
-   - **Successful Deployment:**  
-     Upon successful deployment, your OAuth proxy should be accessible at `https://decap.your-domain.com/auth`.
 
 ##### c. Add Environment Variables to the Worker in Cloudflare
 
@@ -271,7 +280,7 @@ Follow these steps to manually set up each component of the stack.
 3. **Add Environment Variables**
 
    - Go to **"Settings"** > **"Variables"**.
-   - Under **"Environment Variables"**, add the following **Encrypted Variables**:
+   - Under **"Environment Variables"**, add the following **Secret Variables**:
      - **`GITHUB_OAUTH_ID`**: Your GitHub OAuth application's Client ID.
      - **`GITHUB_OAUTH_SECRET`**: Your GitHub OAuth application's Client Secret.
 
@@ -284,7 +293,7 @@ Follow these steps to manually set up each component of the stack.
 
 1. **Navigate to Cloudflare Zero Trust Dashboard**
 
-   - Go to [Cloudflare Zero Trust](https://dash.cloudflare.com/) and select your domain (`your-domain.com`).
+   - Go to [Cloudflare Zero Trust](https://dash.cloudflare.com/) dashboard.
 
 2. **Set Up an Access Policy**
 
@@ -314,10 +323,6 @@ Follow these steps to manually set up each component of the stack.
 
    - **Save the Application**
      - Review the settings and click **"Save"**.
-
-3. **Configure DNS for Zero Trust**
-
-   - Cloudflare Access requires specific DNS configurations. Ensure that the `/admin` path is accessible and properly routed through Cloudflare.
 
 #### 6. Cloudflare Pages Setup
 
@@ -362,14 +367,6 @@ Follow these steps to manually set up each component of the stack.
      ```bash
      npm run build
      ```
-
-     - Ensure your `package.json` has a build script:
-       ```json
-       "scripts": {
-         "build": "astro build",
-         ...
-       }
-       ```
 
    - **Build Output Directory:**
      ```bash
@@ -437,7 +434,7 @@ Follow these steps to manually set up each component of the stack.
 
    - Since your repository is private, ensure that the OAuth flow requests the `repo` scope. This is handled in your `oauth.ts` by setting the `scope` parameter to `'repo'`.
 
-   - **In `oauth.ts`:**
+   - **In `decap-proxy/src/index.ts`:**
      ```typescript
      const authorizationUri = oauth2.authorizeURL({
        redirect_uri: `https://${url.hostname}/callback?provider=github`,
@@ -448,10 +445,6 @@ Follow these steps to manually set up each component of the stack.
 
 2. **Redeploy the Worker After Changes**
    - If you made changes to the worker code, deploy the worker again:
-     ```bash
-     npx wrangler publish
-     ```
-     or
      ```bash
      npm run deploy
      ```
@@ -494,8 +487,8 @@ If you encounter any issues during setup, consider the following troubleshooting
 
 - **Possible Causes:**
 
-  - Incorrect `repo` field in `config.yml`.
-  - OAuth token lacks necessary permissions.
+  - Incorrect `repo` field in `public/admin/config.yml`.
+  - OAuth token lacks necessary permissions. Line 30 in `decap-proxy/src/index.ts` is not set to `'repo'` for private repositories.
 
 - **Solutions:**
 
@@ -522,14 +515,10 @@ If you encounter any issues during setup, consider the following troubleshooting
 
   1. **Verify Environment Variable Names:**
 
-     - Ensure that in Cloudflare Workers settings, the variables are named exactly as referenced in the worker code (`GITHUB_CLIENT_ID` and `GITHUB_CLIENT_SECRET`).
+     - Ensure that in Cloudflare Workers settings, the variables are named exactly as referenced in the worker code (`GITHUB_OAUTH_ID` and `GITHUB_OAUTH_SECRET`).
 
   2. **Redeploy the Worker:**
      - After setting or correcting environment variables, redeploy the worker to apply changes:
-       ```bash
-       npx wrangler publish
-       ```
-       or
        ```bash
        npm run deploy
        ```
@@ -547,15 +536,11 @@ If you encounter any issues during setup, consider the following troubleshooting
 
      - Ensure the worker's callback script correctly sends the token back to Decap CMS and closes the popup.
 
-  2. **Verify `auth_type` in `config.yml`:**
-
-     - If using redirect instead of popup, set `auth_type: "redirect"` and adjust callback logic accordingly.
-
-  3. **Browser Console Errors:**
+  2. **Browser Console Errors:**
 
      - Open developer tools in your browser and check for any JavaScript errors or failed network requests during the authentication process.
 
-  4. **Popup Blockers:**
+  3. **Popup Blockers:**
      - Ensure that your browser is not blocking popups from your site.
 
 ### d. Cloudflare Zero Trust Issues
@@ -587,6 +572,7 @@ This template is provided **as-is**, with no warranties. Please refer to the ind
 
 - **Astro Documentation:** [https://docs.astro.build/](https://docs.astro.build/)
 - **Decap CMS Documentation:** [https://decapcms.org/docs/](https://decapcms.org/docs/)
+- **decap-proxy Documentation:** [https://github.com/sterlingwes/decap-proxy](https://github.com/sterlingwes/decap-proxy)
 - **Cloudflare Workers Documentation:** [https://developers.cloudflare.com/workers/](https://developers.cloudflare.com/workers/)
 - **Cloudflare Zero Trust Documentation:** [https://developers.cloudflare.com/cloudflare-one/](https://developers.cloudflare.com/cloudflare-one/)
 - **GitHub OAuth Documentation:** [https://docs.github.com/en/developers/apps/building-oauth-apps/authorizing-oauth-apps](https://docs.github.com/en/developers/apps/building-oauth-apps/authorizing-oauth-apps)
