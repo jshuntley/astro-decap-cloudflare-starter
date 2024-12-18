@@ -34,7 +34,7 @@ You can either use this repository as a boilerplate to get started quickly or fo
 2. **Install Dependencies**
 
    ```bash
-   npm install
+   npm i
    ```
 
 3. **Configure GitHub OAuth Proxy**
@@ -46,7 +46,7 @@ You can either use this repository as a boilerplate to get started quickly or fo
 
    - Follow steps [4.a.2 to 4.c](#4-configure-the-decap-proxy-worker) in the manual setup section below to set up and deploy the Cloudflare Worker.
 
-4. **Set Up Cloudflare Zero Trust (Optional)**
+4. **Set Up Cloudflare Zero Trust**
 
    - Follow step [5](#5-cloudflare-zero-trust-setup) in the manual setup section below to secure your `/admin` page.
 
@@ -123,12 +123,12 @@ Follow these steps to manually set up each component of the stack.
      ```yaml
      backend:
        name: github
-       repo: "jshuntley/gbc" # Replace with your GitHub username/repo
+       repo: "your-username/your-repo" # Replace with your GitHub username/repo
        branch: main
-       base_url: "https://decap.gilabrewco.com" # To be set after configuring OAuth proxy
+       base_url: "https://decap.your-domain.com" # To be set after configuring OAuth proxy
        auth_endpoint: "auth" # Default path for authentication
 
-     site_url: "https://gilabrewco.com"
+     site_url: "https://your-domain.com"
 
      media_folder: "public/images/uploads"
      public_folder: "/images/uploads"
@@ -460,7 +460,7 @@ Follow these steps to manually set up each component of the stack.
 
 1. **Access the CMS Interface**
 
-   - Navigate to `https://gilabrewco.com/admin` in your browser.
+   - Navigate to `https://your-domain.com/admin` in your browser.
    - **Cloudflare Zero Trust:**
      - You should be prompted by Cloudflare Access to authenticate (e.g., via SSO, email, etc.).
      - Only authorized users can proceed.
@@ -469,7 +469,7 @@ Follow these steps to manually set up each component of the stack.
 
    - Click on **"Login with GitHub"**.
    - **OAuth Proxy Flow:**
-     - A popup should appear directing you to `https://decap.gilabrewco.com/auth`.
+     - A popup should appear directing you to `https://decap.your-domain.com/auth`.
      - You’ll be redirected to GitHub’s OAuth authorization page.
 
 3. **Authorize the Application**
@@ -479,7 +479,7 @@ Follow these steps to manually set up each component of the stack.
 
 4. **Complete the Authentication**
 
-   - After authorization, you should be redirected back to `https://decap.gilabrewco.com/callback` where the OAuth proxy exchanges the code for an access token and communicates it back to Decap CMS.
+   - After authorization, you should be redirected back to `https://decap.your-domain.com/callback` where the OAuth proxy exchanges the code for an access token and communicates it back to Decap CMS.
    - The popup should close automatically, and you should now have access to the CMS interface.
 
 5. **Verify CMS Functionality**
@@ -572,7 +572,7 @@ If you encounter any issues during setup, consider the following troubleshooting
 
   2. **Check DNS Settings:**
 
-     - Ensure that `decap.gilabrewco.com` is correctly pointed in your DNS settings and that the worker is deployed properly.
+     - Ensure that `decap.your-domain.com` is correctly pointed in your DNS settings and that the worker is deployed properly.
 
   3. **Test Without Zero Trust:**
      - Temporarily disable Zero Trust to determine if it’s the source of the issue. If access works without it, review your Zero Trust configuration.
