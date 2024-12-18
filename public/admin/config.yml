@@ -1,0 +1,19 @@
+backend:
+  name: github
+  repo: "your-username/your-repo"
+  branch: main
+  # base_url and auth_endpoint will be set after you configure your OAuth proxy
+site_url: "https://your-site.com" # the URL of your site
+
+media_folder: "public/images/uploads"
+public_folder: "/images/uploads"
+
+collections:
+  - name: "pages"
+    label: "Pages"
+    folder: "src/pages" # the folder where your CMS managed Astro pages are located
+    create: true
+    slug: "{{slug}}"
+    fields:
+      - { label: "Title", name: "title", widget: "string" }
+      - { label: "Body", name: "body", widget: "markdown" }
