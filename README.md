@@ -39,20 +39,15 @@ You can either use this repository as a boilerplate to get started quickly or fo
 
 3. **Configure GitHub OAuth Proxy**
 
-   ```bash
-   cd decap-proxy
-   npm i
-   ```
-
-   - Follow steps [4.a.2 to 4.c](#4-configure-the-decap-proxy-worker) in the manual setup section below to set up and deploy the Cloudflare Worker.
+   - Follow [step 4](#4-configure-the-decap-proxy-worker) in the manual setup section below to set up and deploy the Cloudflare Worker.
 
 4. **Set Up Cloudflare Zero Trust**
 
-   - Follow step [5](#5-cloudflare-zero-trust-setup) in the manual setup section below to secure your `/admin` page.
+   - Follow [step 5](#5-cloudflare-zero-trust-setup) in the manual setup section below to secure your `/admin` page.
 
 5. **Deploy to Cloudflare Pages**
 
-   - Follow step [6](#6-cloudflare-pages-setup) in the manual setup section below to deploy your site.
+   - Follow [step 6](#6-cloudflare-pages-setup) in the manual setup section below to deploy your site.
 
 6. **Access the CMS**
    - Navigate to `https://your-domain.com/admin` and log in with GitHub to start managing your content.
